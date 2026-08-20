@@ -14,7 +14,17 @@ cleaned as (
         coalesce(shipping_fee, 0)::numeric(12,2)        as shipping_fee,
         currency :: text                                as currency
     from source
+),
+
+deduped as (
+    select *
+    from (
+        select *,
+               row_number() over (partition by order_id order by order_date desc) as rn
+        from cleaned
+    ) ranked
+    where rn = 1
 )
 
-select * from cleaned
+select * from deduped
 
