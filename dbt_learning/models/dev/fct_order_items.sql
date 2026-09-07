@@ -43,7 +43,7 @@ facts as (
         *,
         quantity * price                                     as gross_amount,
         quantity * price * discount / 100                 as discount_amount,
-        quantity * price * (1 - discount / 100)            as net_amount,
+        {{ net_amount('oi.quantity', 'oi.unit_price', 'oi.discount_pct') }}::numeric(12,2)           as net_amount,
         quantity * cost_price                                      as total_cost,
         (quantity * price * (1 - discount / 100))
             - (quantity * cost_price)                               as margin
