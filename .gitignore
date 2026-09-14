@@ -41,12 +41,14 @@ assignments_and_evaluation.md
 # are assigned to create and commit in their own forks.
 answer_key/
 
-# Mentor-only: only Weeks 1-4 are released to mentees for now. Later weeks stay
+# Mentor-only: only Weeks 1-5 are released to mentees for now. Later weeks stay
 # local until it's time to hand them out.
-week_5/
 week_6/
 
 # Airflow is a Week 6 topic — keep it hidden until then.
 airflow/dags/dbt_pipeline.py
 dbt_learning/docs/airflow_overview.md
 dbt_learning/docs/pipeline_retrospective.md
+
+# Local-only Claude Code instructions
+CLAUDE.md
