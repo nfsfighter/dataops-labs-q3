@@ -40,15 +40,15 @@ joins as (
 facts as (
 
     select
-        *,
-        quantity * price                                     as gross_amount,
-        quantity * price * discount / 100                 as discount_amount,
-        {{ net_amount('oi.quantity', 'oi.unit_price', 'oi.discount_pct') }}::numeric(12,2)           as net_amount,
-        quantity * cost_price                                      as total_cost,
-        (quantity * price * (1 - discount / 100))
+        oi.*,
+        oi.quantity * oi.price                                     as gross_amount,
+        oi.quantity * oi.price * oi.discount / 100                 as discount_amount,
+        {{ net_amount('oi.quantity', 'oi.price', 'oi.discount') }}::numeric(12,2)           as net_amount,
+        oi.quantity * oi.cost_price                                      as total_cost,
+        {{ net_amount('oi.quantity', 'oi.price', 'oi.discount') }}
             - (quantity * cost_price)                               as margin
 
-    from joins
+    from joins as oi
 
 )
 
