@@ -1,6 +1,7 @@
 {{ config(
     materialized='incremental',
-    unique_key='order_item_id'
+    unique_key='order_item_id',
+    post_hook="create index if not exists idx_fct_order_items_order_id on {{ this }} (order_id)"
 ) }}
 
 with order_items as (
@@ -37,16 +38,17 @@ joins as (
 
 ),
 
+    
 facts as (
 
     select
         oi.*,
-        oi.quantity * oi.price                                     as gross_amount,
-        oi.quantity * oi.price * oi.discount / 100                 as discount_amount,
+        oi.quantity * oi.price                                                              as gross_amount,
+        oi.quantity * oi.price * oi.discount / 100                                          as discount_amount,
         {{ net_amount('oi.quantity', 'oi.price', 'oi.discount') }}::numeric(12,2)           as net_amount,
-        oi.quantity * oi.cost_price                                      as total_cost,
+        oi.quantity * oi.cost_price                                                         as total_cost,
         {{ net_amount('oi.quantity', 'oi.price', 'oi.discount') }}
-            - (quantity * cost_price)                               as margin
+            - (quantity * cost_price)                                                       as margin
 
     from joins as oi
 
