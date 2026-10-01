@@ -9,15 +9,13 @@ Orchestrates the dbt pipeline on a schedule:
       -> dbt_test_stage
       -> dbt_run_dev
       -> dbt_test_dev
+      -> dbt_build
 
 Each task is a BashOperator that runs `dbt` directly. dbt is installed in
 the Airflow image (see Dockerfile.airflow) and the dbt project is mounted at
 /opt/airflow/dbt (see docker-compose.yml), so no Docker-in-Docker is needed.
 dbt connects to the `postgres` service using the POSTGRES_* env vars that
 docker-compose injects from .env into profiles.yml.
-
-Read this file before you change it — Task 6.1 is just running it as-is.
-Tasks 6.2 and 6.3 then ask you to extend it; look for the TODO comments.
 """
 
 from datetime import datetime, timedelta
@@ -29,10 +27,10 @@ from airflow.operators.bash import BashOperator
 DBT_DIR = "/opt/airflow/dbt"
 
 default_args = {
-    "owner": "student_name",          # ← replace with your name
+    "owner": "Ag",          # ← replace with your name
     "depends_on_past": False,
-    # TODO (Task 6.3): give every task two retries, five minutes apart.
-    #   `timedelta` is already imported above.
+    "retries": 2,
+    "retry_delay": timedelta(minutes=5),
 }
 
 
@@ -51,7 +49,8 @@ with DAG(
     default_args=default_args,
     start_date=datetime(2026, 9, 1),
     schedule="0 6 * * *",             # daily at 06:00 UTC (Airflow cron is UTC)
-    # TODO (Task 6.3): stop Airflow backfilling every run since start_date.
+    
+    catchup=False,
     tags=["dbt", "dataops"],
 ) as dag:
 
@@ -61,9 +60,7 @@ with DAG(
     dbt_test_stage = dbt_task(dag, "dbt_test_stage", "test --select stage")
     dbt_run_dev = dbt_task(dag, "dbt_run_dev", "run --select dev")
     dbt_test_dev = dbt_task(dag, "dbt_test_dev", "test --select dev")
-
-    # TODO (Task 6.2): add a task that runs `dbt build`, then wire it onto the
-    #   end of the chain below with `>>`.
+    dbt_build = dbt_task(dag, "dbt_build", "build")
 
     # Linear dependency chain.
     (
@@ -73,4 +70,5 @@ with DAG(
         >> dbt_test_stage
         >> dbt_run_dev
         >> dbt_test_dev
+        >> dbt_build
     )

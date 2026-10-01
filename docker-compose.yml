@@ -23,6 +23,9 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY:-46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=}
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: "5432"
+  
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs
